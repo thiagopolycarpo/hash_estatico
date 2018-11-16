@@ -1,12 +1,12 @@
 # hash_estatico
 
-Exercício 
+<B>Exercício </B>
  
 O objetivo do exercício é gerenciar os livros de uma biblioteca. Para tanto, as seguintes informações são 
 armazenadas: o ISBN do livro (chave primária), o título do livro, o autor, o ano e outras informações que 
 você achar necessárias. O arquivo a ser criado deve ser de registros fixos com campos fixos (fixo-fixo). 
  
-ISBN Título Autor Ano 
+ISBN          Título         Autor        Ano 
 13 caracteres 50 caracteres 50 caracteres 4 caracteres 
  
 O programa conterá as seguintes opções: 
@@ -15,7 +15,7 @@ b. Remover
 c. Buscar 
 d. Carrega Arquivos 
  
-Inserir (a) 
+<B>Inserir (a) </B>
 A cada inserção o ISBN deverá ser adicionado ao índice primário estruturado como uma hash. Portanto, a 
 cada nova inserção as seguintes mensagens deverão ser mostradas: 
  “Endereço X”, endereço X gerado para a chave fornecida; 
