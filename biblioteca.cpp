@@ -1,22 +1,22 @@
 #include<stdio.h>
 #include<conio.h>
 #include<string.h>
+#include<stdlib.h>
 
 int main() {
     FILE *fd;
     
     //////////////////////////////
     struct livro {
-        char isbn[2];
+        char isbn[3];
         char titulo[50];
         char autor[50];
         char ano[5];
-    } vet[6] = {{"3", "TiT-3", "Autor-A-1.3", "3333"},
-                {"2", "TiT-2", "Autor-B", "2222"}, 
-				{"2", "TiT-8", "Autor-D", "8888"},               
-                {"1", "TiT-1", "Autor-A-1.3", "1111"},                
-                {"6", "Titulo-6", "Autor-A-1.3", "6666"},                
-                {"5", "T-5", "Autor-B", "5555"},
+    } vet[5] = {{"03", "TiT-3", "Autor-A-1.3", "3333"},
+                {"02", "TiT-2", "Autor-B", "2222"},                
+                {"10", "TiT-1", "Autor-A-1.3", "1111"},                
+                {"60", "Titulo-6", "Autor-A-1.3", "6666"},                
+                {"55", "T-5", "Autor-B", "5555"},
                 
                 };
        
@@ -26,10 +26,10 @@ int main() {
     
     //////////////////////////////
 	struct buscar {
-        char isbn[2];
-    } vet_b[3] = {{"3"},
-                  {"2"},
-                  {"7"}};
+        char isbn[3];
+    } vet_b[3] = {{"33"},
+                  {"22"},
+                  {"73"}};
        
     fd = fopen("buscar.bin", "w+b");
     fwrite(vet_b, sizeof(vet_b), 1, fd);
@@ -37,10 +37,10 @@ int main() {
     
     //////////////////////////////
     struct remover {
-        char isbn[2];
-    } vet_r[3] = {{"6"},
-                  {"3"},
-                  {"7"}};
+        char isbn[3];
+    } vet_r[3] = {{"36"},
+                  {"43"},
+                  {"67"}};
        
     fd = fopen("remover.bin", "w+b");
     fwrite(vet_r, sizeof(vet_r), 1, fd);

@@ -10,7 +10,7 @@
 
 #define TAM_STRUCT 100
 #define TAM_HASH 31
-#define VAZIO "@"
+#define VAZIO "@@"
 #define NULO -1 
 
 /* variaveis globais */
@@ -22,12 +22,12 @@ char atualizar[] = "ab", leitura[] = "rb+", escrever[] = "wb";
 
 /* Structs */
 struct hash{
-	char isbn[2];
+	char isbn[3];
 	int rrn;
 }tabela_hash[TAM_HASH];
 
 struct livro {
-        char isbn[2];
+        char isbn[3];
         char titulo[50];
         char autor[50];
         char ano[5];
@@ -36,11 +36,11 @@ struct livro {
 #define TAM_REGISTRO sizeof(struct livro) 
 
 struct buscar {
-        char isbn[2];
+        char isbn[3];
 }arq_buscar[TAM_STRUCT];
 
 struct remover {
-        char isbn[2];
+        char isbn[3];
 }arq_remover[TAM_STRUCT]; 
 
 /* prototipos */
@@ -227,11 +227,12 @@ int inserir_arq_principal(){
 }
 
 int divisao_inteira(char chave[]){
-	int soma;
-	soma = (chave[0] % TAM_HASH) + (chave[1] % TAM_HASH); // usar espaco tbm na soma???
-	printf("\n Endereco %d para chave %s",soma,chave);
-	//getch();
-	return soma;
+   int i, soma = chave[0];
+   for (i = 1; chave[i] != '\0'; i++){
+      soma = (soma * 31 + chave[i]) % TAM_HASH;
+   }
+   printf("\n Endereco %d",soma);
+   return soma;
 }
 
 void inserir_indice(int posicao_hash, int rrn, char chave[]){
