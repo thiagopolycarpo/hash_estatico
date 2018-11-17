@@ -9,7 +9,9 @@
 /* Defines */
 
 #define TAM_STRUCT 100
-#define TAM_HASH 31 
+#define TAM_HASH 31
+#define VAZIO "@"
+#define NULO -1 
 
 /* variaveis globais */
 
@@ -22,7 +24,7 @@ char atualizar[] = "ab", leitura[] = "rb+", escrever[] = "wb";
 struct hash{
 	char isbn[2];
 	int rrn;
-};
+}tabela_hash[TAM_HASH];
 
 struct livro {
         char isbn[2];
@@ -46,10 +48,11 @@ int inserir_arq_principal();
 int criar_arquivo(char nome_arq[]);
 int abrir_arquivo(char nome_arq[], char tipo_abertura[]);
 int divisao_inteira(char chave[]);
+int colisao(int posicao_hash, int *nova_posica);
 void carregar_arquivo();
 void inicializar_hash();
 void fechar_arquivo(FILE **p_arq);
-void inserir_indice(int posicao_hash, int offset, char chave[]);
+void inserir_indice(int posicao_hash, int rrn, char chave[]);
 
 /* funcoes */
 int main(){
@@ -75,7 +78,7 @@ int main(){
 				break;
 			}
 		  	case 3: {
-	  			//buscar
+	  			//buscar();
 	  			break;
 	  		}
 	  		case 4:{
@@ -167,8 +170,8 @@ void carregar_arquivo(){
 } 
 
 int inserir_arq_principal(){
-	char nome_arq[]="livros.bin", chave[2];
-	int cont, posicao_hash, offset_livros;
+	char nome_arq[]="livros.bin", chave[2], hash_arq[]="hash.bin";
+	int cont, posicao_hash, rrn_livros, nova_posicao=-1, tentativa =0, posicao_inicial, nao_achou;
 	
 	system("cls");
 	
@@ -188,13 +191,28 @@ int inserir_arq_principal(){
 		}
 		strcpy(chave, arq_livros[cont].isbn);
 		posicao_hash = divisao_inteira(chave);
-		fseek(arq,8,0);
-		fwrite(&arq_livros[cont],TAM_REGISTRO,1,arq);
-		fseek(arq,-sizeof(struct livro),1);
-		offset_livros = ftell(arq) + sizeof(struct livro);
-		fclose(arq);
-		inserir_indice(posicao_hash, offset_livros, chave);
-		printf("\n Chave %s inserida com sucesso  ",chave);
+		
+		if(cont > 0){
+			abrir_arquivo(hash_arq,leitura);
+			posicao_inicial = posicao_hash;
+			nao_achou = colisao(posicao_hash, &nova_posicao);  
+			fclose(arq_hash);
+		}else{
+		 	nao_achou =1;
+		}
+		if(nao_achou){
+			fseek(arq,12,0);
+			fwrite(&arq_livros[cont],TAM_REGISTRO,1,arq);
+			fseek(arq,-sizeof(struct livro),1);
+			rrn_livros = ftell(arq);
+			fclose(arq);
+			inserir_indice(nova_posicao, rrn_livros, chave);
+			printf("\n Chave %s inserida com sucesso  ",chave);
+		}else{
+			printf("\nNão tem mais espaço para insercao na tabela hash");
+		}
+		
+	
 		
 		//atualizando cont insercao
 		abrir_arquivo(nome_arq,"rt+");
@@ -212,11 +230,11 @@ int divisao_inteira(char chave[]){
 	int soma;
 	soma = (chave[0] % TAM_HASH) + (chave[1] % TAM_HASH); // usar espaco tbm na soma???
 	printf("\n Endereco %d para chave %s",soma,chave);
-	getch();
+	//getch();
 	return soma;
 }
 
-void inserir_indice(int posicao_hash, int offset, char chave[]){
+void inserir_indice(int posicao_hash, int rrn, char chave[]){
 	char nome_arq[]= "hash.bin";
 	int pos;
 	
@@ -226,18 +244,44 @@ void inserir_indice(int posicao_hash, int offset, char chave[]){
 	}
 	pos = posicao_hash * sizeof(struct hash);
 	fseek(arq_hash,pos,0);
-	fwrite(chave,sizeof(chave),1,arq_hash);
-	fwrite(&offset,sizeof(int),1,arq_hash);
+	fwrite(chave,sizeof(char),1,arq_hash);
+	fwrite(&rrn,sizeof(int),1,arq_hash);
 	fechar_arquivo(&arq_hash);
 	printf("\n Inserirdo no arquivo hash");
 }
 
 void inicializar_hash(){
-	hash *hashpage;
-	strcpy(hashpage->isbn,"@");
-	hashpage->rrn=-1;
-	fwrite(&hashpage, sizeof(struct hash), 31,arq_hash);
+	int i;
+	for(i=0;i<TAM_HASH;i++){
+		strcpy(tabela_hash[i].isbn,VAZIO);
+		tabela_hash[i].rrn=NULO;
+		fwrite(&tabela_hash[i],1,sizeof(struct hash),arq_hash);
+		printf("\n registro %d -> %s - %d",i,tabela_hash[i].isbn,tabela_hash[i].rrn);
+	}	
 	printf("\nArquivo de Hash Inicializado!");
+		
+}
+
+int colisao(int posicao_hash, int *nova_posicao){
+	int i=0, tentativa =0, posicao_inicial;
+	char chave_teste[2];
+	strcpy(chave_teste,VAZIO);
+	posicao_inicial = posicao_hash - 1;
+	
+	for(i=0;i<31;i++){
+		fseek(arq_hash,posicao_hash*sizeof(struct hash),0);
+		fread(&tabela_hash[0],sizeof(struct hash), 1,arq_hash);
+		if(strcmp(tabela_hash[0].isbn,chave_teste) == 0){
+			*nova_posicao = posicao_hash;
+			return 1; /* não tem colisão */
+		}
+		tentativa++;
+		printf("\nColisao\nTentativa %d",tentativa);
+		*nova_posicao = posicao_hash + 1;
+		printf("\nNovaPosicao %d",*nova_posicao);
+		posicao_hash = *nova_posicao;
+	}
+	return 0; /* não tem mais espaço na tabela hash */	
 }
 
 

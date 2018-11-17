@@ -11,8 +11,9 @@ int main() {
         char titulo[50];
         char autor[50];
         char ano[5];
-    } vet[5] = {{"3", "TiT-3", "Autor-A-1.3", "3333"},
-                {"2", "TiT-2", "Autor-B", "2222"},                
+    } vet[6] = {{"3", "TiT-3", "Autor-A-1.3", "3333"},
+                {"2", "TiT-2", "Autor-B", "2222"}, 
+				{"2", "TiT-8", "Autor-D", "8888"},               
                 {"1", "TiT-1", "Autor-A-1.3", "1111"},                
                 {"6", "Titulo-6", "Autor-A-1.3", "6666"},                
                 {"5", "T-5", "Autor-B", "5555"},
