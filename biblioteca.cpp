@@ -39,10 +39,10 @@ int main() {
     //////////////////////////////
     struct remover {
         char isbn[3];
-    } vet_r[4] = {{"36"},
+    } vet_r[4] = {{"02"},
                   {"43"},
                   {"67"},
-				  {"02"}};
+				  {"36"}};
        
     fd = fopen("remover.bin", "w+b");
     fwrite(vet_r, sizeof(vet_r), 1, fd);
