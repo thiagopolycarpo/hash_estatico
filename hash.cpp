@@ -205,7 +205,7 @@ int inserir_arq_principal(){
 		 	nao_achou =1;
 		}
 		if(nao_achou){
-			fseek(arq,12,0);
+			fseek(arq,0,2);
 			fwrite(&arq_livros[cont],TAM_REGISTRO,1,arq);
 			fseek(arq,-sizeof(struct livro),1);
 			rrn_livros = ftell(arq);
