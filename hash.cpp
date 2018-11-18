@@ -48,8 +48,9 @@ int inserir_arq_principal();
 int criar_arquivo(char nome_arq[]);
 int abrir_arquivo(char nome_arq[], char tipo_abertura[]);
 int divisao_inteira(char chave[]);
-int colisao(int posicao_hash, int *nova_posica);
+int colisao(int posicao_hash, int *nova_posicao);
 void carregar_arquivo();
+int buscar();
 void inicializar_hash();
 void fechar_arquivo(FILE **p_arq);
 void inserir_indice(int posicao_hash, int rrn, char chave[]);
@@ -78,7 +79,7 @@ int main(){
 				break;
 			}
 		  	case 3: {
-	  			//buscar();
+	  			buscar();
 	  			break;
 	  		}
 	  		case 4:{
@@ -170,7 +171,7 @@ void carregar_arquivo(){
 } 
 
 int inserir_arq_principal(){
-	char nome_arq[]="livros.bin", chave[2], hash_arq[]="hash.bin";
+	char nome_arq[]="livros.bin", chave[3], hash_arq[]="hash.bin";
 	int cont, posicao_hash, rrn_livros, nova_posicao=-1, tentativa =0, posicao_inicial, nao_achou;
 	
 	system("cls");
@@ -243,10 +244,11 @@ void inserir_indice(int posicao_hash, int rrn, char chave[]){
 		arq_hash = fopen("hash.bin","wb");
 		inicializar_hash();
 	}
+	strcpy(tabela_hash[0].isbn,chave);
+	tabela_hash[0].rrn;
 	pos = posicao_hash * sizeof(struct hash);
 	fseek(arq_hash,pos,0);
-	fwrite(chave,sizeof(char),1,arq_hash);
-	fwrite(&rrn,sizeof(int),1,arq_hash);
+	fwrite(&tabela_hash[0],sizeof(struct hash),1,arq_hash);
 	fechar_arquivo(&arq_hash);
 	printf("\n Inserirdo no arquivo hash");
 }
@@ -265,7 +267,7 @@ void inicializar_hash(){
 
 int colisao(int posicao_hash, int *nova_posicao){
 	int i=0, tentativa =0, posicao_inicial;
-	char chave_teste[2];
+	char chave_teste[3];
 	strcpy(chave_teste,VAZIO);
 	posicao_inicial = posicao_hash - 1;
 	
@@ -283,6 +285,58 @@ int colisao(int posicao_hash, int *nova_posicao){
 		posicao_hash = *nova_posicao;
 	}
 	return 0; /* não tem mais espaço na tabela hash */	
+}
+
+int buscar(){
+	char nome_arq[]="livros.bin", chave[3], hash_arq[]="hash.bin";
+	int cont, posicao_hash, acesso=1,i;
+	
+	system("cls");
+	
+	if(!abrir_arquivo(nome_arq,leitura)){
+		printf("\nImpossivel abrir arquivo");
+		return 0;
+	}
+	fseek(arq,8,0);
+	fread(&cont, sizeof(int), 1, arq);
+	printf("\nContador busca: %d", cont);
+	
+	if(cont < cont_buscar){
+		strcpy(chave,arq_buscar[cont].isbn);
+		posicao_hash = divisao_inteira(chave);
+		
+		abrir_arquivo(hash_arq,leitura);
+		for(i=0;i<31;i++){
+			fseek(arq_hash,posicao_hash*sizeof(struct hash),0);
+			fread(&tabela_hash[0],sizeof(struct hash), 1,arq_hash);
+			if(strcmp(tabela_hash[0].isbn,chave) == 0){
+				fseek(arq,tabela_hash[0].rrn*sizeof(struct livro),0);
+				fread(&arq_livros[0],sizeof(struct livro),1,arq);
+				printf("\nChave %s encontrada, endereco %d, %d acesso(s) ",chave, posicao_hash,acesso);
+				printf("\nISBN: %s \nTitulo: %s \nAutor: %s \nAno: %s",arq_livros[0].isbn,
+					   arq_livros[0].titulo,arq_livros[0].autor,arq_livros[0].titulo);
+				fclose(arq);
+				fclose(arq_hash);
+				break; /* arq achado em uma unica posicao */
+			}
+			posicao_hash = posicao_hash + 1;
+        	acesso = acesso +1;
+		}
+		if(i == 31){
+			printf("\nChave %s nao encontrada",chave);
+		}
+		fclose(arq_hash);
+		//atualizando cont insercao
+		abrir_arquivo(nome_arq,"rt+");
+		fseek(arq, 8, 0);
+		cont++;
+		fwrite(&cont, sizeof(int), 1, arq);
+		fclose(arq);
+	}else{
+		printf("\nNao ha mais livros a serem buscados\n");
+	}	
+	getch();
+	return 1;
 }
 
 

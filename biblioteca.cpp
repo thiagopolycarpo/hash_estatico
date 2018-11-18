@@ -27,9 +27,10 @@ int main() {
     //////////////////////////////
 	struct buscar {
         char isbn[3];
-    } vet_b[3] = {{"33"},
-                  {"22"},
-                  {"73"}};
+    } vet_b[4] = {{"33"},
+                  {"10"},
+                  {"73"},
+				  {"22"}};
        
     fd = fopen("buscar.bin", "w+b");
     fwrite(vet_b, sizeof(vet_b), 1, fd);
@@ -38,9 +39,10 @@ int main() {
     //////////////////////////////
     struct remover {
         char isbn[3];
-    } vet_r[3] = {{"36"},
+    } vet_r[4] = {{"36"},
                   {"43"},
-                  {"67"}};
+                  {"67"},
+				  {"02"}};
        
     fd = fopen("remover.bin", "w+b");
     fwrite(vet_r, sizeof(vet_r), 1, fd);
