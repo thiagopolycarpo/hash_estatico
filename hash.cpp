@@ -181,19 +181,20 @@ int inserir_arq_principal(){
 		criar_arquivo(nome_arq);
 	}
 	abrir_arquivo(nome_arq,leitura);
+	fseek(arq,0,0);
 	fread(&cont, sizeof(int), 1, arq);
 	printf("\nContador insercao: %d", cont);
 	fclose(arq);
 	
 	if(cont < cont_inserir){
-		if(!abrir_arquivo(nome_arq, atualizar)){
+		if(!abrir_arquivo(nome_arq, leitura)){
 			printf("\nErro, arquivo nao pode ser aberto");
 			getch();
 			return 0;
 		}
 		strcpy(chave, arq_livros[cont].isbn);
 		posicao_hash = divisao_inteira(chave);
-		printf("\n Endereco %d",soma);
+		printf("\n Endereco %d",posicao_hash);
 		
 		if(cont > 0){
 			abrir_arquivo(hash_arq,leitura);
@@ -214,13 +215,10 @@ int inserir_arq_principal(){
 		}else{
 			printf("\nNão tem mais espaço para insercao na tabela hash");
 		}
-		
-	
-		
 		//atualizando cont insercao
-		abrir_arquivo(nome_arq,"rt+");
+		abrir_arquivo(nome_arq,leitura);
 		fseek(arq, 0, 0);
-		cont++;
+		cont=cont+1;
 		fwrite(&cont, sizeof(int), 1, arq);
 		fclose(arq);
 	}else{
@@ -230,11 +228,7 @@ int inserir_arq_principal(){
 }
 
 int divisao_inteira(char chave[]){
-   int i, soma = chave[0];
-   for (i = 1; chave[i] != '\0'; i++){
-      soma = (soma * 31 + chave[i]) % TAM_HASH;
-   }
-   return soma;
+   return atoi(chave) % TAM_HASH;
 }
 
 void inserir_indice(int posicao_hash, int rrn, char chave[]){
@@ -260,10 +254,9 @@ void inicializar_hash(){
 		strcpy(tabela_hash[i].isbn,VAZIO);
 		tabela_hash[i].rrn=NULO;
 		fwrite(&tabela_hash[i],1,sizeof(struct hash),arq_hash);
-		printf("\n registro %d -> %s - %d",i,tabela_hash[i].isbn,tabela_hash[i].rrn);
+		//printf("\n registro %d -> %s - %d",i,tabela_hash[i].isbn,tabela_hash[i].rrn); teste
 	}	
 	printf("\nArquivo de Hash Inicializado!");
-		
 }
 
 int colisao(int posicao_hash, int *nova_posicao){
@@ -283,6 +276,9 @@ int colisao(int posicao_hash, int *nova_posicao){
 		tentativa++;
 		printf("\nColisao\nTentativa %d",tentativa);
 		*nova_posicao = posicao_hash + 1;
+		if(*nova_posicao > 31){
+			*nova_posicao =0;
+		}
 		printf("\nNovaPosicao %d",*nova_posicao);
 		posicao_hash = *nova_posicao;
 	}
@@ -322,6 +318,9 @@ int buscar(){
 				break; /* arq achado em uma unica posicao */
 			}
 			posicao_hash = posicao_hash + 1;
+			if(posicao_hash > 31){
+				posicao_hash = 0;
+			}
         	acesso = acesso +1;
 		}
 		if(i == 31){
@@ -373,6 +372,9 @@ int remover(){
 				break; /* arq achado em uma unica posicao */
 			}
 			posicao_hash = posicao_hash + 1;
+			if(posicao_hash > 31){
+				posicao_hash = 0;
+			}
         }
 		if(i == 31){
 			printf("\nChave %s nao existe no arquvo",chave);
