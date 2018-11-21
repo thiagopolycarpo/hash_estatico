@@ -203,12 +203,13 @@ int inserir_arq_principal(){
 			fclose(arq_hash);
 		}else{
 		 	nao_achou =1;
+		 	nova_posicao = posicao_hash;
 		}
 		if(nao_achou){
 			fseek(arq,0,2);
 			fwrite(&arq_livros[cont],TAM_REGISTRO,1,arq);
-			fseek(arq,-sizeof(struct livro),1);
-			rrn_livros = ftell(arq);
+			//fseek(arq,-sizeof(struct livro),1);
+			rrn_livros = ftell(arq) - sizeof(struct livro);
 			fclose(arq);
 			inserir_indice(nova_posicao, rrn_livros, chave);
 			printf("\n Chave %s inserida com sucesso  ",chave);
@@ -238,9 +239,9 @@ void inserir_indice(int posicao_hash, int rrn, char chave[]){
 	if(!abrir_arquivo(nome_arq,leitura)){
 		arq_hash = fopen(nome_arq,escrever);
 		inicializar_hash();
-	}
+	}	
 	strcpy(tabela_hash[0].isbn,chave);
-	tabela_hash[0].rrn;
+	tabela_hash[0].rrn = rrn;
 	pos = posicao_hash * sizeof(struct hash);
 	fseek(arq_hash,pos,0);
 	fwrite(&tabela_hash[0],sizeof(struct hash),1,arq_hash);
@@ -276,7 +277,7 @@ int colisao(int posicao_hash, int *nova_posicao){
 		tentativa++;
 		printf("\nColisao\nTentativa %d",tentativa);
 		*nova_posicao = posicao_hash + 1;
-		if(*nova_posicao > 31){
+		if(*nova_posicao > 30){
 			*nova_posicao =0;
 		}
 		printf("\nNova Posicao %d",*nova_posicao);
@@ -321,7 +322,7 @@ int buscar(){
 				break; /* arq achado em uma unica posicao */
 			}
 			posicao_hash = posicao_hash + 1;
-			if(posicao_hash > 31 ){
+			if(posicao_hash > 30 ){
 				posicao_hash = 0;
 			}
 			
@@ -379,7 +380,7 @@ int remover(){
 				break; /* arq achado em uma unica posicao */
 			}
 			posicao_hash = posicao_hash + 1;
-			if(posicao_hash > 31){
+			if(posicao_hash > 30){
 				posicao_hash = 0;
 			}
         }
