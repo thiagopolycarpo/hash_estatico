@@ -45,7 +45,7 @@ struct remover {
 
 /* prototipos */
 int abrir_arquivo(char nome_arq[], char tipo_abertura[]);
-int colisao(int posicao_hash, int *nova_posicao);
+int colisao(int posicao_hash, int *nova_posicao, char chave[]);
 int criar_arquivo(char nome_arq[]);
 int divisao_inteira(char chave[]);
 int inserir_arq_principal();
@@ -199,7 +199,7 @@ int inserir_arq_principal(){
 		if(cont > 0){
 			abrir_arquivo(hash_arq,leitura);
 			posicao_inicial = posicao_hash;
-			nao_achou = colisao(posicao_hash, &nova_posicao);  
+			nao_achou = colisao(posicao_hash, &nova_posicao, chave);  
 			fclose(arq_hash);
 		}else{
 		 	nao_achou =1;
@@ -260,7 +260,7 @@ void inicializar_hash(){
 	printf("\nArquivo de Hash Inicializado!");
 }
 
-int colisao(int posicao_hash, int *nova_posicao){
+int colisao(int posicao_hash, int *nova_posicao, char chave[]){
 	int i=0, tentativa =0, posicao_inicial;
 	char chave_teste[3], chave_teste_excluida[3];
 	strcpy(chave_teste,VAZIO);
@@ -270,6 +270,9 @@ int colisao(int posicao_hash, int *nova_posicao){
 	for(i=0;i<31;i++){
 		fseek(arq_hash,posicao_hash*sizeof(struct hash),0);
 		fread(&tabela_hash[0],sizeof(struct hash), 1,arq_hash);
+		if((strcmp(tabela_hash[0].isbn,chave)) == 0){
+			printf("\nRegistro ja existe!");
+		}
 		if((strcmp(tabela_hash[0].isbn,chave_teste) == 0) || (strcmp(tabela_hash[0].isbn,chave_teste_excluida) == 0)){
 			*nova_posicao = posicao_hash;
 			return 1; /* não tem colisão */
