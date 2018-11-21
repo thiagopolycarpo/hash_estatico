@@ -270,9 +270,7 @@ int colisao(int posicao_hash, int *nova_posicao, char chave[]){
 	for(i=0;i<31;i++){
 		fseek(arq_hash,posicao_hash*sizeof(struct hash),0);
 		fread(&tabela_hash[0],sizeof(struct hash), 1,arq_hash);
-		if((strcmp(tabela_hash[0].isbn,chave)) == 0){
-			printf("\nRegistro ja existe!");
-		}
+		
 		if((strcmp(tabela_hash[0].isbn,chave_teste) == 0) || (strcmp(tabela_hash[0].isbn,chave_teste_excluida) == 0)){
 			*nova_posicao = posicao_hash;
 			return 1; /* não tem colisão */
